@@ -24,9 +24,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
@@ -40,74 +39,74 @@ import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.BlockDefinition;
 import appeng.datagen.providers.IAE2DataProvider;
 
-public class BlockTagsProvider extends IntrinsicHolderTagsProvider<Block> implements IAE2DataProvider {
+public class BlockTagsProvider extends net.neoforged.neoforge.common.data.BlockTagsProvider implements IAE2DataProvider {
     public BlockTagsProvider(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-        super(packOutput, Registries.BLOCK, registries, block -> block.builtInRegistryHolder().key(), AppEng.MOD_ID);
+        super(packOutput, registries, AppEng.MOD_ID);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider registries) {
         // Black- and whitelist tags
         tag(AETags.SPATIAL_BLACKLIST)
-                .add(Blocks.BEDROCK)
+                .add(blockKey(Blocks.BEDROCK))
                 .addOptionalTag(ConventionTags.IMMOVABLE_BLOCKS);
         tag(AETags.ANNIHILATION_PLANE_BLOCK_BLACKLIST);
         tag(AETags.FACADE_BLOCK_WHITELIST)
-                .add(AEBlocks.QUARTZ_GLASS.block(), AEBlocks.QUARTZ_VIBRANT_GLASS.block(),
-                        Blocks.CHISELED_BOOKSHELF, Blocks.JUKEBOX, Blocks.FURNACE, Blocks.BLAST_FURNACE, Blocks.DROPPER,
-                        Blocks.DISPENSER, Blocks.CRAFTER, Blocks.BARREL, Blocks.BEE_NEST, Blocks.BEEHIVE,
-                        Blocks.SCULK_CATALYST, Blocks.SOUL_SAND, Blocks.HONEY_BLOCK,
-                        AEBlocks.CONTROLLER.block(), AEBlocks.CRAFTING_STORAGE_1K.block(),
-                        AEBlocks.CRAFTING_STORAGE_4K.block(), AEBlocks.CRAFTING_STORAGE_16K.block(),
-                        AEBlocks.CRAFTING_STORAGE_64K.block(), AEBlocks.CRAFTING_STORAGE_256K.block(),
-                        AEBlocks.CRAFTING_MONITOR.block(), AEBlocks.CRAFTING_UNIT.block(),
-                        AEBlocks.CRAFTING_ACCELERATOR.block())
+                .add(blockKey(AEBlocks.QUARTZ_GLASS.block()), blockKey(AEBlocks.QUARTZ_VIBRANT_GLASS.block()),
+                        blockKey(Blocks.CHISELED_BOOKSHELF), blockKey(Blocks.JUKEBOX), blockKey(Blocks.FURNACE), blockKey(Blocks.BLAST_FURNACE), blockKey(Blocks.DROPPER),
+                        blockKey(Blocks.DISPENSER), blockKey(Blocks.CRAFTER), blockKey(Blocks.BARREL), blockKey(Blocks.BEE_NEST), blockKey(Blocks.BEEHIVE),
+                        blockKey(Blocks.SCULK_CATALYST), blockKey(Blocks.SOUL_SAND), blockKey(Blocks.HONEY_BLOCK),
+                        blockKey(AEBlocks.CONTROLLER.block()), blockKey(AEBlocks.CRAFTING_STORAGE_1K.block()),
+                        blockKey(AEBlocks.CRAFTING_STORAGE_4K.block()), blockKey(AEBlocks.CRAFTING_STORAGE_16K.block()),
+                        blockKey(AEBlocks.CRAFTING_STORAGE_64K.block()), blockKey(AEBlocks.CRAFTING_STORAGE_256K.block()),
+                        blockKey(AEBlocks.CRAFTING_MONITOR.block()), blockKey(AEBlocks.CRAFTING_UNIT.block()),
+                        blockKey(AEBlocks.CRAFTING_ACCELERATOR.block()))
                 .addOptionalTag(ConventionTags.GLASS_BLOCK);
         tag(AETags.GROWTH_ACCELERATABLE)
                 // TODO: Should all be in some conventional tag
-                .add(Blocks.BAMBOO_SAPLING, Blocks.BAMBOO, Blocks.SUGAR_CANE, Blocks.VINE,
-                        Blocks.TWISTING_VINES, Blocks.WEEPING_VINES, Blocks.CAVE_VINES, Blocks.SWEET_BERRY_BUSH,
-                        Blocks.NETHER_WART, Blocks.KELP, Blocks.COCOA)
+                .add(blockKey(Blocks.BAMBOO_SAPLING), blockKey(Blocks.BAMBOO), blockKey(Blocks.SUGAR_CANE), blockKey(Blocks.VINE),
+                        blockKey(Blocks.TWISTING_VINES), blockKey(Blocks.WEEPING_VINES), blockKey(Blocks.CAVE_VINES), blockKey(Blocks.SWEET_BERRY_BUSH),
+                        blockKey(Blocks.NETHER_WART), blockKey(Blocks.KELP), blockKey(Blocks.COCOA))
                 .addOptionalTag(ConventionTags.CROPS)
                 .addOptionalTag(ConventionTags.SAPLINGS)
                 .addTag(ConventionTags.BUDDING_BLOCKS_BLOCKS);
 
         tag(ConventionTags.BUDDING_BLOCKS_BLOCKS)
-                .add(AEBlocks.FLAWLESS_BUDDING_QUARTZ.block())
-                .add(AEBlocks.FLAWED_BUDDING_QUARTZ.block())
-                .add(AEBlocks.CHIPPED_BUDDING_QUARTZ.block())
-                .add(AEBlocks.DAMAGED_BUDDING_QUARTZ.block());
+                .add(blockKey(AEBlocks.FLAWLESS_BUDDING_QUARTZ.block()))
+                .add(blockKey(AEBlocks.FLAWED_BUDDING_QUARTZ.block()))
+                .add(blockKey(AEBlocks.CHIPPED_BUDDING_QUARTZ.block()))
+                .add(blockKey(AEBlocks.DAMAGED_BUDDING_QUARTZ.block()));
         tag(ConventionTags.BUDS_BLOCKS)
-                .add(AEBlocks.SMALL_QUARTZ_BUD.block())
-                .add(AEBlocks.MEDIUM_QUARTZ_BUD.block())
-                .add(AEBlocks.LARGE_QUARTZ_BUD.block());
+                .add(blockKey(AEBlocks.SMALL_QUARTZ_BUD.block()))
+                .add(blockKey(AEBlocks.MEDIUM_QUARTZ_BUD.block()))
+                .add(blockKey(AEBlocks.LARGE_QUARTZ_BUD.block()));
         tag(ConventionTags.CLUSTERS_BLOCKS)
-                .add(AEBlocks.QUARTZ_CLUSTER.block());
+                .add(blockKey(AEBlocks.QUARTZ_CLUSTER.block()));
 
         tag(ConventionTags.CERTUS_QUARTZ_STORAGE_BLOCK_BLOCK)
-                .add(AEBlocks.QUARTZ_BLOCK.block());
+                .add(blockKey(AEBlocks.QUARTZ_BLOCK.block()));
         tag(Tags.Blocks.STORAGE_BLOCKS)
                 .addTag(ConventionTags.CERTUS_QUARTZ_STORAGE_BLOCK_BLOCK);
 
         // Special behavior is associated with this tag, so our walls need to be added to it
         tag(BlockTags.WALLS).add(
-                AEBlocks.SKY_STONE_WALL.block(),
-                AEBlocks.SMOOTH_SKY_STONE_WALL.block(),
-                AEBlocks.SKY_STONE_BRICK_WALL.block(),
-                AEBlocks.SKY_STONE_SMALL_BRICK_WALL.block(),
-                AEBlocks.FLUIX_WALL.block(),
-                AEBlocks.QUARTZ_WALL.block(),
-                AEBlocks.CUT_QUARTZ_WALL.block(),
-                AEBlocks.SMOOTH_QUARTZ_WALL.block(),
-                AEBlocks.QUARTZ_BRICK_WALL.block(),
-                AEBlocks.CHISELED_QUARTZ_WALL.block(),
-                AEBlocks.QUARTZ_PILLAR_WALL.block());
+                blockKey(AEBlocks.SKY_STONE_WALL.block()),
+                blockKey(AEBlocks.SMOOTH_SKY_STONE_WALL.block()),
+                blockKey(AEBlocks.SKY_STONE_BRICK_WALL.block()),
+                blockKey(AEBlocks.SKY_STONE_SMALL_BRICK_WALL.block()),
+                blockKey(AEBlocks.FLUIX_WALL.block()),
+                blockKey(AEBlocks.QUARTZ_WALL.block()),
+                blockKey(AEBlocks.CUT_QUARTZ_WALL.block()),
+                blockKey(AEBlocks.SMOOTH_QUARTZ_WALL.block()),
+                blockKey(AEBlocks.QUARTZ_BRICK_WALL.block()),
+                blockKey(AEBlocks.CHISELED_QUARTZ_WALL.block()),
+                blockKey(AEBlocks.QUARTZ_PILLAR_WALL.block()));
 
-        tag(Tags.Blocks.CHESTS).add(AEBlocks.SKY_STONE_CHEST.block(), AEBlocks.SMOOTH_SKY_STONE_CHEST.block());
-        tag(ConventionTags.GLASS_BLOCK).add(AEBlocks.QUARTZ_GLASS.block(), AEBlocks.QUARTZ_VIBRANT_GLASS.block());
+        tag(Tags.Blocks.CHESTS).add(blockKey(AEBlocks.SKY_STONE_CHEST.block()), blockKey(AEBlocks.SMOOTH_SKY_STONE_CHEST.block()));
+        tag(ConventionTags.GLASS_BLOCK).add(blockKey(AEBlocks.QUARTZ_GLASS.block()), blockKey(AEBlocks.QUARTZ_VIBRANT_GLASS.block()));
 
         // Fixtures should cause walls to have posts
-        tag(BlockTags.WALL_POST_OVERRIDE).add(AEBlocks.QUARTZ_FIXTURE.block(), AEBlocks.LIGHT_DETECTOR.block());
+        tag(BlockTags.WALL_POST_OVERRIDE).add(blockKey(AEBlocks.QUARTZ_FIXTURE.block()), blockKey(AEBlocks.LIGHT_DETECTOR.block()));
 
         addEffectiveTools();
     }
@@ -136,6 +135,10 @@ public class BlockTagsProvider extends IntrinsicHolderTagsProvider<Block> implem
             AEBlocks.SKY_STONE_SMALL_BRICK_SLAB
     };
 
+    private static ResourceKey<Block> blockKey(Block block) {
+        return block.builtInRegistryHolder().key();
+    }
+
     private void addEffectiveTools() {
         Map<BlockDefinition<?>, List<TagKey<Block>>> specialTags = new HashMap<>();
         for (var skyStoneBlock : SKY_STONE_BLOCKS) {
@@ -145,7 +148,7 @@ public class BlockTagsProvider extends IntrinsicHolderTagsProvider<Block> implem
 
         for (var block : AEBlocks.getBlocks()) {
             for (var desiredTag : specialTags.getOrDefault(block, defaultTags)) {
-                tag(desiredTag).add(block.block());
+                tag(desiredTag).add(blockKey(block.block()));
             }
         }
 

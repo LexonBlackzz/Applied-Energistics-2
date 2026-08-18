@@ -2,7 +2,7 @@ package appeng.client.integrations.itemlists;
 
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.QuadInstance;
 
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix3x2f;
@@ -11,22 +11,18 @@ import org.joml.Quaternionf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
-import net.minecraft.client.renderer.block.FluidRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.client.model.pipeline.VertexConsumerWrapper;
+import net.neoforged.neoforge.fluids.FluidStack;
+
+import appeng.client.render.CubeBuilder;
 
 public class FluidBlockPictureInPictureRenderer
         extends PictureInPictureRenderer<FluidBlockPictureInPictureRenderer.State> {
-
-    public FluidBlockPictureInPictureRenderer(MultiBufferSource.BufferSource bufferSource) {
-        super(bufferSource);
-    }
 
     @Override
     public Class<State> getRenderStateClass() {
@@ -34,28 +30,30 @@ public class FluidBlockPictureInPictureRenderer
     }
 
     @Override
-    protected void renderToTexture(State renderState, PoseStack poseStack) {
+    protected void renderToTexture(State renderState, PoseStack poseStack, SubmitNodeCollector submitNodeCollector) {
         var minecraft = Minecraft.getInstance();
-        var fluidModelSet = minecraft.getModelManager().getFluidStateModelSet();
+        var fluidModel = minecraft.getModelManager().getFluidStateModelSet()
+                .get(renderState.fluid.defaultFluidState());
 
-        minecraft.gameRenderer.getLighting().setupFor(Lighting.Entry.LEVEL);
+        minecraft.gameRenderer.lighting().setupFor(Lighting.Entry.LEVEL);
 
-        var fluidState = renderState.fluid.defaultFluidState();
+        var fluidStack = new FluidStack(renderState.fluid, 1);
+        var sprite = fluidModel.stillMaterial().sprite();
+        var tintSource = fluidModel.fluidTintSource();
+        var color = tintSource != null ? tintSource.colorAsStack(fluidStack) : -1;
 
         poseStack.pushPose();
         setupOrthographicProjection(poseStack);
 
-        var fluidRenderer = new FluidRenderer(fluidModelSet);
-        fluidRenderer.tesselate(
-                BlockAndTintGetter.EMPTY,
-                BlockPos.ZERO,
-                layer -> {
-                    // TODO 26.1: Unclear if this is still needed
-                    var buffer = bufferSource.getBuffer(
-                            layer.translucent() ? Sheets.translucentBlockSheet() : Sheets.cutoutBlockSheet());
-                    return new LiquidVertexConsumer(buffer, poseStack.last());
-                },
-                fluidState.createLegacyBlock(), fluidState);
+        submitNodeCollector.submitCustomGeometry(poseStack, Sheets.translucentBlockItemSheet(), (pose, buffer) -> {
+            var quadInstance = new QuadInstance();
+            quadInstance.setColor(color);
+            quadInstance.setLightCoords(LightCoordsUtil.FULL_BRIGHT);
+
+            var builder = new CubeBuilder(quad -> buffer.putBakedQuad(pose, quad, quadInstance));
+            builder.setTexture(sprite);
+            builder.addCube(0, 0, 0, 16, 16, 16);
+        });
 
         poseStack.popPose();
     }
@@ -100,26 +98,5 @@ public class FluidBlockPictureInPictureRenderer
 
         // Move into the center of the block for the transforms
         poseStack.translate(-0.5f, -0.5f, -0.5f);
-    }
-
-    /**
-     * The only purpose of this vertex consumer proxy is to transform vertex positions emitted by the
-     * {@link FluidRenderer} into absolute coordinates. The renderer assumes it is being called in the context of
-     * tessellating a chunk section (16x16x16) and emits corresponding coordinates, while we batch all visible chunks in
-     * the guidebook together.
-     */
-    private static class LiquidVertexConsumer extends VertexConsumerWrapper {
-        private final PoseStack.Pose pose;
-
-        public LiquidVertexConsumer(VertexConsumer delegate, PoseStack.Pose pose) {
-            super(delegate);
-            this.pose = pose;
-        }
-
-        @Override
-        public VertexConsumer addVertex(float x, float y, float z) {
-            // add missing UV1 for entity format which is used to replace TRANSLUCENT in non-chunk-section render
-            return parent.addVertex(pose, x, y, z).setUv1(0, 0);
-        }
     }
 }
