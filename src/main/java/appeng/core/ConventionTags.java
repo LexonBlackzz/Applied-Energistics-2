@@ -139,7 +139,8 @@ public final class ConventionTags {
 
     // For Growth Accelerator
     public static final TagKey<Block> CROPS = BlockTags.CROPS;
-    public static final TagKey<Block> SAPLINGS = BlockTags.SAPLINGS;
+    public static final TagKey<Block> SAPLINGS = TagKey.create(Registries.BLOCK,
+            Identifier.withDefaultNamespace("saplings"));
 
     /**
      * Platform tags for blocks that should not be moved, i.e. some pipes, chunk loaders, etc...

@@ -2,7 +2,9 @@ package appeng.server.testplots;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Blocks;
 
 import appeng.api.config.Actionable;
 import appeng.api.config.PowerMultiplier;
@@ -139,11 +141,11 @@ public final class SubnetPlots {
         var subnetOrigin = origin.north();
         plot.cable(subnetOrigin)
                 .part(Direction.SOUTH, AEParts.STORAGE_BUS, bus -> {
-                    bus.getConfig().addFilter(Items.RED_CONCRETE);
+                    bus.getConfig().addFilter(Blocks.CONCRETE.pick(DyeColor.RED).asItem());
                 });
         plot.cable(subnetOrigin.east())
                 .part(Direction.SOUTH, AEParts.STORAGE_BUS, bus -> {
-                    bus.getConfig().addFilter(Items.BLUE_CONCRETE);
+                    bus.getConfig().addFilter(Blocks.CONCRETE.pick(DyeColor.BLUE).asItem());
                 });
         plot.cable(subnetOrigin.east().east())
                 .part(Direction.SOUTH, AEParts.QUARTZ_FIBER)
@@ -159,16 +161,16 @@ public final class SubnetPlots {
                         // Insert drive content
                         var mainGrid = helper.getGrid(origin);
                         var mainInv = mainGrid.getStorageService().getInventory();
-                        mainInv.insert(AEItemKey.of(Items.RED_CONCRETE), 64, Actionable.MODULATE,
+                        mainInv.insert(AEItemKey.of(Blocks.CONCRETE.pick(DyeColor.RED).asItem()), 64, Actionable.MODULATE,
                                 IActionSource.empty());
-                        mainInv.insert(AEItemKey.of(Items.BLUE_CONCRETE), 64, Actionable.MODULATE,
+                        mainInv.insert(AEItemKey.of(Blocks.CONCRETE.pick(DyeColor.BLUE).asItem()), 64, Actionable.MODULATE,
                                 IActionSource.empty());
                     })
                     .thenIdle(1)
                     .thenExecute(() -> {
                         // Ensure both red and blue concrete are visible on the sub-network
-                        helper.assertNetworkContains(subnetOrigin, Items.RED_CONCRETE);
-                        helper.assertNetworkContains(subnetOrigin, Items.BLUE_CONCRETE);
+                        helper.assertNetworkContains(subnetOrigin, Blocks.CONCRETE.pick(DyeColor.RED).asItem());
+                        helper.assertNetworkContains(subnetOrigin, Blocks.CONCRETE.pick(DyeColor.BLUE).asItem());
                     })
                     .thenSucceed();
         });
